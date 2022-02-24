@@ -1,6 +1,6 @@
 {
   "name": "csv-to-json",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Converts a csv file to json",
   "author": "freaksone @FreaksOnE",
   "bin": {
