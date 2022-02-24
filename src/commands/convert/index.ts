@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prefer-node-protocol */
-import {Command, Flags} from '@oclif/core'
+import {Command/* , Flags */} from '@oclif/core'
 import {createReadStream, createWriteStream, existsSync} from 'fs'
 import * as csv from 'csv-parser'
 
@@ -13,10 +13,10 @@ export default class Convert extends Command {
   ]
 
   static flags = {
-    from: Flags.string({char: 'i', description: 'Path to csv file to convert to json', required: false}),
+    // from: Flags.string({char: 'i', description: 'Path to csv file to convert to json', required: false}),
   }
 
-  static args = [{name: 'input', description: 'Path to csv file to convert to json', required: false}]
+  static args = [{name: 'input', description: 'Path to csv file to convert to json', required: true}]
 
   async run(): Promise<void> {
     const {args/* , flags */} = await this.parse(Convert)
