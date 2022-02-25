@@ -1,3 +1,4 @@
+/* eslint-disable no-warning-comments */
 /* eslint-disable unicorn/prefer-node-protocol */
 import {Command, Flags} from '@oclif/core'
 import {createReadStream, createWriteStream, existsSync} from 'fs'
@@ -20,9 +21,13 @@ export default class Convert extends Command {
     {name: 'input', description: 'Path to csv file to convert to json', required: true},
   ]
 
+  // TODO: add loading
+  // get the file lines
+  // count written records
+  // and calculate loading percent
   async run(): Promise<void> {
     const {args, flags} = await this.parse(Convert)
-    this.log(`${flags.utf8}`)
+
     type IRecord = Record<string, any>
     const outputName = `${args.input.split('.csv')[0]}.json`
 
@@ -45,7 +50,9 @@ export default class Convert extends Command {
 
     let isFirstLine = true
 
-    createReadStream(args.input)
+    createReadStream(args.input, {
+      encoding: flags.utf8 ? 'utf8' : undefined,
+    })
     .pipe(csv())
     .on('data', (record: IRecord) => {
       if (!isFirstLine) writeStream.write(',\n')
@@ -58,7 +65,6 @@ export default class Convert extends Command {
     })
     .on('end', () => {
       writeStream.write('\n]\n')
-      writeStream.close()
       this.log('Done.')
     })
   }
