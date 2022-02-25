@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prefer-node-protocol */
-import {Command/* , Flags */} from '@oclif/core'
+import {Command, Flags} from '@oclif/core'
 import {createReadStream, createWriteStream, existsSync} from 'fs'
 import * as csv from 'csv-parser'
 
@@ -13,14 +13,16 @@ export default class Convert extends Command {
   ]
 
   static flags = {
-    // from: Flags.string({char: 'i', description: 'Path to csv file to convert to json', required: false}),
+    utf8: Flags.boolean({name: 'utf8', description: 'Force output encoding to utf8', required: false}),
   }
 
-  static args = [{name: 'input', description: 'Path to csv file to convert to json', required: true}]
+  static args = [
+    {name: 'input', description: 'Path to csv file to convert to json', required: true},
+  ]
 
   async run(): Promise<void> {
-    const {args/* , flags */} = await this.parse(Convert)
-
+    const {args, flags} = await this.parse(Convert)
+    this.log(`${flags.utf8}`)
     type IRecord = Record<string, any>
     const outputName = `${args.input.split('.csv')[0]}.json`
 
@@ -34,7 +36,10 @@ export default class Convert extends Command {
 
     this.log(`Converting ${args.input} to ${outputName}`)
 
-    const writeStream = createWriteStream(outputName, {flags: 'a'})
+    const writeStream = createWriteStream(outputName, {
+      encoding: flags.utf8 ? 'utf8' : undefined,
+      flags: 'a',
+    })
 
     writeStream.write('[\n')
 
