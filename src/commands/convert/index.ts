@@ -3,6 +3,24 @@
 import {Command, Flags} from '@oclif/core'
 import {createReadStream, createWriteStream, existsSync} from 'fs'
 import * as csv from 'csv-parser'
+import createCliProgress from '../../create-cli-progress'
+
+const countFileLines = (filePath: string): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    let lineCount = 0
+    createReadStream(filePath)
+    .on('data', (buffer: Buffer) => {
+      let idx = -1
+      lineCount-- // Because the loop will run once for idx=-1
+      do {
+        idx = buffer.indexOf(10, idx + 1)
+        lineCount++
+      } while (idx !== -1)
+    }).on('end', () => {
+      resolve(lineCount)
+    }).on('error', reject)
+  })
+}
 
 export default class Convert extends Command {
   static description = 'Convert a csv file to json file'
@@ -50,6 +68,14 @@ export default class Convert extends Command {
 
     let isFirstLine = true
 
+    const loadingBar = createCliProgress({
+      name: 'convert-csv-to-json',
+    })
+
+    const fileLines = await countFileLines(args.input)
+
+    loadingBar.start(fileLines - 1, 0)
+
     createReadStream(args.input, {
       encoding: flags.utf8 ? 'utf8' : undefined,
     })
@@ -59,6 +85,7 @@ export default class Convert extends Command {
       writeStream.write('  ')
       writeStream.write(JSON.stringify(record))
       isFirstLine = false
+      loadingBar.increment(1)
     })
     .on('error', (error: Error) => {
       this.error(error)
