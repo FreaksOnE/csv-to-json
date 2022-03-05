@@ -7,6 +7,7 @@ interface IProps {
 const createCliProgress = (props: IProps): SingleBar => {
   return new SingleBar({
     barsize: 20,
+    etaBuffer: 100,
     format: `# ${props.name} [{bar}] {percentage}% | ETA: {eta}s | {value}/{total}`,
   }, Presets.rect)
 }

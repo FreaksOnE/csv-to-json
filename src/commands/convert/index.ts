@@ -88,10 +88,12 @@ export default class Convert extends Command {
       loadingBar.increment(1)
     })
     .on('error', (error: Error) => {
+      loadingBar.stop()
       this.error(error)
     })
     .on('end', () => {
       writeStream.write('\n]\n')
+      loadingBar.stop()
       this.log('Done.')
     })
   }
